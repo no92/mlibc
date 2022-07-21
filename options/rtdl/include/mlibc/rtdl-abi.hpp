@@ -7,9 +7,9 @@
 
 struct __abi_tls_entry {
 	struct SharedObject *object;
-	uint64_t offset;
+	size_t offset;
 };
-static_assert(sizeof(__abi_tls_entry) == 16, "Bad __abi_tls_entry size");
+static_assert(sizeof(__abi_tls_entry) == sizeof(size_t) * 2, "Bad __abi_tls_entry size");
 
 extern "C" void *__dlapi_get_tls(struct __abi_tls_entry *);
 
