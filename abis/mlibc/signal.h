@@ -163,7 +163,7 @@ struct sigaction {
 	void (*sa_sigaction)(int, siginfo_t *, void *);
 };
 
-#if defined(__x86_64__) || defined(__aarch64__)
+#if defined(__x86_64__) || defined(__i686__) || defined(__aarch64__)
 // TODO: This is wrong for AArch64.
 
 typedef struct {
