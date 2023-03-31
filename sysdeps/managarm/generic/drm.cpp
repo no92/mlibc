@@ -11,7 +11,17 @@
 
 namespace mlibc {
 
+int ioctl_drm_driver_specific(int fd, unsigned long request, void *arg, int *result, HelHandle handle);
+
 int ioctl_drm(int fd, unsigned long request, void *arg, int *result, HelHandle handle) {
+	if(_IOC_TYPE(request) != DRM_IOCTL_BASE) {
+		return ENOTTY;
+	}
+
+	if(_IOC_NR(request) >= DRM_COMMAND_BASE && _IOC_NR(request) < DRM_COMMAND_END) {
+		return ioctl_drm_driver_specific(fd, request, arg, result, handle);
+	}
+
 	managarm::fs::IoctlRequest<MemoryAllocator> ioctl_req(getSysdepsAllocator());
 
 	switch(request) {

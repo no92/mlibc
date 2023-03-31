@@ -33,6 +33,7 @@ rtld_deps += [ bragi_dep, hel_dep, proto_posix_dep ]
 
 libc_sources += files(
 	'generic/drm.cpp',
+	'generic/drm-driver-specific.cpp',
 	'generic/ensure.cpp',
 	'generic/entry.cpp',
 	'generic/file.cpp',
