@@ -98,7 +98,7 @@ int ioctl_drm_virtio(int fd, unsigned long request, void *arg, int *result, HelH
 
 			managarm::fs::DrmIoctlVirtioExecBufferReply<MemoryAllocator> resp{getSysdepsAllocator()};
 			resp.ParseFromArray(recv_resp.data(), recv_resp.length());
-			param->fence_fd = 0;
+			param->fence_fd = -1;
 
 			__ensure(resp.error() == managarm::fs::Errors::SUCCESS);
 
@@ -229,6 +229,9 @@ int ioctl_drm_virtio(int fd, unsigned long request, void *arg, int *result, HelH
 
 			HEL_CHECK(recv_buf.error());
 
+			break;
+		}
+		case DRM_VIRTGPU_WAIT: {
 			break;
 		}
 		default: {
