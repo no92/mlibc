@@ -6,12 +6,39 @@
 
 namespace mlibc {
 
-mem_file::mem_file(char **ptr, size_t *sizeloc, void (*do_dispose)(abstract_file *))
-: abstract_file{do_dispose}, _bufloc{ptr}, _sizeloc{sizeloc}, _buf{getAllocator()}, _pos{0} { }
+/* constructor for `open_memstream`-style */
+mem_file::mem_file(char **ptr, size_t *sizeloc, int flags, void (*do_dispose)(abstract_file *), bool allow_resizing)
+: abstract_file{do_dispose}, _bufloc{ptr}, _sizeloc{sizeloc}, _flags{flags},
+	_allowResizing{allow_resizing} { }
+
+/* constructor for `fmemopen`-style */
+mem_file::mem_file(void *in_buf, size_t size, int flags, void (*do_dispose)(abstract_file *))
+: abstract_file{do_dispose}, _inBuffer{in_buf}, _inBufferSize{size}, _flags{flags},
+	_allowResizing{false} {
+	if(!_inBuffer) {
+		_inBuffer = getAllocator().allocate(size);
+		_needsDeallocation = true;
+	}
+
+	if(_flags & O_APPEND) {
+		/* the initial seek-size for append is zero if buf was NULL, or the first '\0' found, or the size */
+		_max_size = (_needsDeallocation) ? 0 : strnlen(reinterpret_cast<char *>(_inBuffer), _inBufferSize);
+	} else if((_flags & O_WRONLY || _flags & O_RDWR) && _flags & O_CREAT && _flags & O_TRUNC) {
+		/* modes: "w", "w+" */
+		_max_size = 0;
+	} else {
+		_max_size = size;
+	}
+}
 
 int mem_file::close() {
 	_update_ptrs();
 	_buf.detach();
+
+	if(!_allowResizing && _needsDeallocation) {
+		getAllocator().free(_inBuffer);
+	}
+
 	return 0;
 }
 
@@ -35,39 +62,76 @@ int mem_file::io_read(char *, size_t, size_t *) {
 }
 
 int mem_file::io_write(const char *buffer, size_t max_size, size_t *actual_size) {
-	if (_pos + max_size >= _buf.size()) {
+	if (_allowResizing && _pos + max_size >= _buffer_size()) {
 		_buf.resize(_pos + max_size + 1, '\0');
 		_update_ptrs();
 	}
 
-	memcpy(_buf.data() + _pos, buffer, max_size);
+	size_t bytes_write = std::min(_buffer_size() - _pos, max_size);
+	memcpy(_buffer().data() + _pos, buffer, bytes_write);
 	_pos += max_size;
 	*actual_size = max_size;
+
+	if(!_allowResizing) {
+		if(_pos > _max_size) {
+			_max_size = _pos;
+		}
+
+		/* upon flushing, we need to put a null byte at the current position or at the end of the buffer */
+		size_t null = _pos;
+		/* a special case is if the mode is set to updating ('+'), then it always goes at the end */
+		if(null >= _buffer_size() || _flags & O_RDWR) {
+			null = _buffer_size() - 1;
+		}
+
+		if(_buffer_size()) {
+			_buffer()[null] = '\0';
+		}
+	}
+
 	return 0;
 }
 
 int mem_file::io_seek(off_t offset, int whence, off_t *new_offset) {
 	switch (whence) {
 		case SEEK_SET:
+			if(!_allowResizing) {
+				if(offset < 0 || size_t(offset) > _buffer_size()) {
+					return EINVAL;
+				}
+			}
 			_pos = offset;
-			if (_pos >= _buf.size()) {
+			if (_allowResizing && _pos >= 0 && size_t(_pos) >= _buffer_size()) {
 				_buf.resize(_pos + 1, '\0');
 				_update_ptrs();
 			}
 			*new_offset = _pos;
 			break;
 		case SEEK_CUR:
+			/* seeking to negative positions or positions larger than the buffer is disallowed in fmemopen(3) */
+			if(!_allowResizing) {
+				if((_pos + offset) < 0 || size_t(_pos + offset) > _buffer_size()) {
+					return EINVAL;
+				}
+			}
 			_pos += offset;
-			if (_pos >= _buf.size()) {
+			if (_allowResizing && _pos >= 0 && size_t(_pos) >= _buffer_size()) {
 				_buf.resize(_pos + 1, '\0');
 				_update_ptrs();
 			}
 			*new_offset = _pos;
 			break;
 		case SEEK_END:
-			_pos = _buf.size() ? _buf.size() - 1 + offset : _buf.size() + offset;
-			_buf.resize(_pos + 1, '\0');
-			_update_ptrs();
+			if(_allowResizing) {
+				_pos = _buffer_size() ? _buffer_size() - 1 + offset : _buffer_size() + offset;
+				_buf.resize(_pos + 1, '\0');
+				_update_ptrs();
+			} else {
+				if((_max_size + offset) < 0 || size_t(_max_size + offset) > _buffer_size()) {
+					return EINVAL;
+				}
+				_pos = _max_size + offset;
+			}
 			*new_offset = _pos;
 			break;
 		default:
@@ -77,8 +141,10 @@ int mem_file::io_seek(off_t offset, int whence, off_t *new_offset) {
 }
 
 void mem_file::_update_ptrs() {
-	*_bufloc = _buf.data();
-	*_sizeloc = _buf.size() - 1;
+	if(_allowResizing) {
+		*_bufloc = _buf.data();
+		*_sizeloc = _buf.size() - 1;
+	}
 }
 
 int cookie_file::close() {
