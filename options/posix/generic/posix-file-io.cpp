@@ -57,8 +57,17 @@ int mem_file::determine_bufmode(buffer_mode *mode) {
 	return 0;
 }
 
-int mem_file::io_read(char *, size_t, size_t *) {
-	return EINVAL;
+int mem_file::io_read(char *buffer, size_t max_size, size_t *actual_size) {
+	if ((_pos >= 0 && _pos >= _max_size) || !max_size) {
+		*actual_size = 0;
+		return 0;
+	}
+
+	size_t bytes_read = std::min(size_t(_max_size - _pos), max_size);
+	memcpy(buffer, _buffer().data() + _pos, bytes_read);
+	_pos += bytes_read;
+	*actual_size = bytes_read;
+	return 0;
 }
 
 int mem_file::io_write(const char *buffer, size_t max_size, size_t *actual_size) {
