@@ -49,6 +49,7 @@ all_test_cases = [
 	'posix/pwd',
 	'posix/fdopen',
 	'posix/fopencookie',
+	'posix/fmemopen',
 	'posix/getaddrinfo',
 	'posix/getdelim',
 	'posix/getnameinfo',
