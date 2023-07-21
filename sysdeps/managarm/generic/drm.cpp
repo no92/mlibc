@@ -1107,8 +1107,27 @@ int ioctl_drm(int fd, unsigned long request, void *arg, int *result, HelHandle h
 		return 0;
 	}
 	case DRM_IOCTL_GEM_CLOSE: {
-		mlibc::infoLogger() << "\e[35mmlibc: DRM_IOCTL_GEM_CLOSE"
-				" is a noop\e[39m" << frg::endlog;
+		auto param = reinterpret_cast<drm_gem_close *>(arg);
+		managarm::fs::DrmIoctlGemCloseRequest<MemoryAllocator> req{getSysdepsAllocator()};
+
+		req.set_handle(param->handle);
+
+		auto [offer, send_ioctl_req, send_req, recv_resp] =
+		exchangeMsgsSync(
+			handle,
+			helix_ng::offer(
+				helix_ng::sendBragiHeadOnly(ioctl_req, getSysdepsAllocator()),
+				helix_ng::sendBragiHeadOnly(req, getSysdepsAllocator()),
+				helix_ng::recvInline()
+		));
+		HEL_CHECK(offer.error());
+		HEL_CHECK(send_ioctl_req.error());
+		HEL_CHECK(send_req.error());
+		HEL_CHECK(recv_resp.error());
+
+		managarm::fs::DrmIoctlGemCloseReply<MemoryAllocator> resp{getSysdepsAllocator()};
+		resp.ParseFromArray(recv_resp.data(), recv_resp.length());
+
 		return 0;
 	}
 	case DRM_IOCTL_PRIME_HANDLE_TO_FD: {
