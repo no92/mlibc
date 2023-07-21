@@ -168,6 +168,35 @@ int ioctl_drm_virtio(int fd, unsigned long request, void *arg, int *result, HelH
 
 			break;
 		}
+		case DRM_VIRTGPU_RESOURCE_INFO: {
+			auto param = reinterpret_cast<drm_virtgpu_resource_info *>(arg);
+			managarm::fs::DrmIoctlVirtioResourceInfoRequest<MemoryAllocator> req{getSysdepsAllocator()};
+
+			req.set_bo_handle(param->bo_handle);
+
+			auto [offer, send_ioctl_req, send_ioctl_driver_req, send_req, recv_resp] =
+			exchangeMsgsSync(
+				handle,
+				helix_ng::offer(
+					helix_ng::sendBragiHeadOnly(ioctl_req, getSysdepsAllocator()),
+					helix_ng::sendBragiHeadOnly(ioctl_driver_req, getSysdepsAllocator()),
+					helix_ng::sendBragiHeadOnly(req, getSysdepsAllocator()),
+					helix_ng::recvInline()
+			));
+			HEL_CHECK(offer.error());
+			HEL_CHECK(send_ioctl_req.error());
+			HEL_CHECK(send_ioctl_driver_req.error());
+			HEL_CHECK(send_req.error());
+			HEL_CHECK(recv_resp.error());
+
+			managarm::fs::DrmIoctlVirtioResourceInfoReply<MemoryAllocator> resp{getSysdepsAllocator()};
+			resp.ParseFromArray(recv_resp.data(), recv_resp.length());
+
+			param->res_handle = resp.res_handle();
+			param->size = resp.size();
+
+			break;
+		}
 		case DRM_VIRTGPU_GET_CAPS: {
 			auto param = reinterpret_cast<drm_virtgpu_get_caps *>(arg);
 			managarm::fs::DrmIoctlVirtioGetCapsRequest<MemoryAllocator> req{getSysdepsAllocator()};
