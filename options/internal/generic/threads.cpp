@@ -115,7 +115,7 @@ int thread_mutex_init(struct __mlibc_mutex *__restrict mutex,
 	// TODO: Other values aren't supported yet.
 	__ensure(robust == __MLIBC_THREAD_MUTEX_STALLED);
 	__ensure(protocol == __MLIBC_THREAD_PRIO_NONE);
-	__ensure(pshared == __MLIBC_THREAD_PROCESS_PRIVATE);
+	// __ensure(pshared == __MLIBC_THREAD_PROCESS_PRIVATE);
 
 	return 0;
 }

@@ -79,6 +79,10 @@ int ioctl_drm_virtio(int fd, unsigned long request, void *arg, int *result, HelH
 			req.set_size(param->size);
 			req.set_flags(param->flags);
 
+			for(size_t i = 0; i < param->num_bo_handles && param->bo_handles; i++) {
+				req.add_bo_handles(reinterpret_cast<uint32_t *>(param->bo_handles)[i]);
+			}
+
 			auto [offer, send_ioctl_req, send_ioctl_driver_req, send_req, send_buf, recv_resp] =
 			exchangeMsgsSync(
 				handle,
@@ -232,6 +236,7 @@ int ioctl_drm_virtio(int fd, unsigned long request, void *arg, int *result, HelH
 			break;
 		}
 		case DRM_VIRTGPU_WAIT: {
+			mlibc::infoLogger() << "mlibc: DRM_VIRTGPU_WAIT is a no-op!" << frg::endlog;
 			break;
 		}
 		default: {
@@ -241,6 +246,7 @@ int ioctl_drm_virtio(int fd, unsigned long request, void *arg, int *result, HelH
 		}
 	}
 
+	*result = 0;
 	return 0;
 }
 
