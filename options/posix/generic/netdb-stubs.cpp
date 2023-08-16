@@ -316,10 +316,15 @@ int gethostbyaddr_r(const void *__restrict, socklen_t, int, struct hostent *__re
 	__builtin_unreachable();
 }
 
-int gethostbyname_r(const char *__restrict, struct hostent *__restrict, char *__restrict, size_t,
+int gethostbyname_r(const char *__restrict name, struct hostent *__restrict h, char *__restrict buf, size_t buflen,
+					struct hostent **__restrict res, int *__restrict err) {
+	return gethostbyname2_r(name, AF_INET, h, buf, buflen, res, err);
+}
+
+int gethostbyname2_r(const char *__restrict, int, struct hostent *__restrict, char *__restrict, size_t,
 					struct hostent **__restrict, int *__restrict) {
-	__ensure(!"Not implemented");
-	__builtin_unreachable();
+	mlibc::infoLogger() << "\e[31mmlibc: gethostbyname2_r always returns HOST_NOT_FOUND\e[39m" << frg::endlog;
+	return HOST_NOT_FOUND;
 }
 
 struct protoent *getprotobyname(const char *) {

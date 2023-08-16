@@ -120,6 +120,8 @@ int gethostbyaddr_r(const void *__restrict, socklen_t, int, struct hostent *__re
 					char *__restrict, size_t, struct hostent **__restrict, int *__restrict);
 int gethostbyname_r(const char *__restrict, struct hostent *__restrict, char *__restrict, size_t,
 					struct hostent **__restrict, int *__restrict);
+int gethostbyname2_r(const char *__restrict, int af, struct hostent *__restrict, char *__restrict, size_t,
+					struct hostent **__restrict, int *__restrict);
 int getnameinfo(const struct sockaddr *__restrict, socklen_t,
 		char *__restrict, socklen_t, char *__restrict, socklen_t, int);
 struct netent *getnetbyaddr(uint32_t, int);
