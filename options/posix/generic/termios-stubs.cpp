@@ -16,9 +16,16 @@ int cfsetispeed(struct termios *, speed_t) {
 	__ensure(!"Not implemented");
 	__builtin_unreachable();
 }
-int cfsetospeed(struct termios *, speed_t) {
-	__ensure(!"Not implemented");
-	__builtin_unreachable();
+
+int cfsetospeed(struct termios *tio, speed_t speed) {
+	if(speed & ~CBAUD) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	tio->c_cflag = (tio->c_cflag & ~CBAUD) | speed;
+
+	return 0;
 }
 
 void cfmakeraw(struct termios *t) {

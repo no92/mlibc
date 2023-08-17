@@ -51,6 +51,9 @@ extern "C" {
 #define TIOCM_DTR 0x002
 #define TIOCM_RTS 0x004
 
+// calculate the mask by shifting 1 by the index of the (highest bit + 1), and subtracting one to obtain the mask
+#define CBAUD ((1 << (((sizeof(unsigned int) * CHAR_BIT) - 1 - __builtin_clz(B230400)) + 1)) - 1)
+
 #ifndef __MLIBC_ABI_ONLY
 
 speed_t cfgetispeed(const struct termios *);
