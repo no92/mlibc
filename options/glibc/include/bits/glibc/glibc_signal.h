@@ -5,6 +5,14 @@
 extern "C" {
 #endif
 
+#ifdef _GNU_SOURCE
+
+#include <abi-bits/signal.h>
+
+typedef __sighandler sighandler_t;
+
+#endif // _GNU_SOURCE
+
 #ifndef __MLIBC_ABI_ONLY
 
 int tgkill(int, int, int);
