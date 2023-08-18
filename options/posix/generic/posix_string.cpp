@@ -2,6 +2,10 @@
 #define _GNU_SOURCE
 #endif
 
+#ifndef _BSD_SOURCE
+#define _BSD_SOURCE
+#endif
+
 #include <bits/ensure.h>
 #include <stdlib.h>
 #include <string.h>
@@ -171,4 +175,9 @@ size_t strlcat(char *d, const char *s, size_t n) {
 		return l + strlen(s);
 	}
 	return l + strlcpy(d + l, s, n - l);
+}
+
+void explicit_bzero(void *d, size_t len) {
+	d = memset(d, 0, len);
+	__asm__ __volatile__ ("" : : "r"(d) : "memory");
 }

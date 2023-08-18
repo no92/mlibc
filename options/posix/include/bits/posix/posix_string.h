@@ -48,6 +48,12 @@ size_t strlcat(char *d, const char *s, size_t n);
 
 #endif /* !__MLIBC_ABI_ONLY */
 
+#ifdef _BSD_SOURCE
+
+void explicit_bzero(void *d, size_t n);
+
+#endif // _BSD_SOURCE
+
 #ifdef __cplusplus
 }
 #endif
