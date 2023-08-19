@@ -195,6 +195,28 @@ typedef struct __stack {
 #define SI_USER 0
 #define SI_KERNEL 128
 
+#if defined(__i386__)
+#define REG_GS 0
+#define REG_FS 1
+#define REG_ES 2
+#define REG_DS 3
+#define REG_EDI 4
+#define REG_ESI 5
+#define REG_EBP 6
+#define REG_ESP 7
+#define REG_EBX 8
+#define REG_EDX 9
+#define REG_ECX 10
+#define REG_EAX 11
+#define REG_TRAPNO 12
+#define REG_ERR 13
+#define REG_EIP 14
+#define REG_CS 15
+#define REG_EFL 16
+#define REG_UESP 17
+#define REG_SS 18
+#define NGREG 19
+#else
 #define REG_R8 0
 #define REG_R9 1
 #define REG_R10 2
@@ -219,6 +241,7 @@ typedef struct __stack {
 #define REG_OLDMASK 21
 #define REG_CR2 22
 #define NGREG 23
+#endif
 
 struct sigevent {
 	union sigval sigev_value;
@@ -242,7 +265,7 @@ struct sigaction {
 
 // Taken from the linux kernel headers
 
-#if defined(__x86_64__)
+#if defined(__x86_64__) || defined(__i386__)
 
 struct _fpreg {
 	unsigned short significand[4];
@@ -260,17 +283,40 @@ struct _xmmreg {
 };
 
 struct _fpstate {
-	uint16_t cwd;
-	uint16_t swd;
-	uint16_t ftw;
-	uint16_t fop;
-	uint64_t rip;
-	uint64_t rdp;
-	uint32_t mxcsr;
-	uint32_t mxcr_mask;
-	struct _fpxreg _st[8];
-	struct _xmmreg _xmm[16];
-	uint32_t padding[24];
+#if defined(__x86_64__)
+  uint16_t cwd;
+  uint16_t swd;
+  uint16_t ftw; // NOTE: ???
+  uint16_t fop;
+  uint64_t rip;
+  uint64_t rdp;
+  uint32_t mxcsr;
+  uint32_t mxcr_mask;
+  struct _fpxreg _st[8];
+  struct _xmmreg _xmm[16];
+  uint32_t padding[24];
+#elif defined(__i386__)
+  uint32_t cw;
+  uint32_t sw;
+  uint32_t tag;
+  uint32_t ipoff;
+  uint32_t cssel;
+  uint32_t dataoff;
+  uint32_t datasel;
+  struct _fpreg _st[8];
+  uint16_t status;
+  uint16_t magic;
+
+  // FXSR FPU
+
+  uint32_t _fxsr_env[6];
+  uint32_t mxscr;
+  uint32_t reserved;
+  struct _fpxreg _fxsr_st[8];
+  struct _xmmreg _xmm[8];
+
+  uint32_t padding2[56];
+#endif
 };
 
 typedef struct {
