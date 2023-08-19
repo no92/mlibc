@@ -7,6 +7,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <abi-bits/in.h>
+#include <mlibc-config.h>
 
 #define ICMP6_FILTER 1
 
@@ -118,6 +119,10 @@ struct nd_opt_mtu {
 	uint16_t nd_opt_mtu_reserved;
 	uint32_t nd_opt_mtu_mtu;
 };
+
+#if __MLIBC_GLIBC_OPTION
+#	include <bits/glibc/glibc_icmp6.h>
+#endif
 
 #ifdef __cplusplus
 }
