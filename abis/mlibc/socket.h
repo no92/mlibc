@@ -94,6 +94,7 @@ struct cmsghdr {
 #define SO_TIMESTAMPNS 30
 #define SO_PRIORITY 31
 #define SO_MARK 32
+#define SO_DEBUG 33
 
 #define SOMAXCONN 1
 
