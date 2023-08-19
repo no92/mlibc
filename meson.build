@@ -267,7 +267,7 @@ internal_sources = [
 ]
 
 internal_dso_sources = [
-	'options/internal/gcc-extra/mlibc_crtbegin.S',
+	'options/internal' / host_machine.cpu_family() / 'mlibc_crtbegin.S',
 	'options/internal' / host_machine.cpu_family() / 'mlibc_crtend.S',
 ]
 
