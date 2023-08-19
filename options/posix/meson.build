@@ -105,6 +105,7 @@ if not no_headers
 		'include/mqueue.h',
 	)
 	install_headers(
+		'include/arpa/ftp.h',
 		'include/arpa/inet.h',
 		'include/arpa/tftp.h',
 		subdir: 'arpa'
