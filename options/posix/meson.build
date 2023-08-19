@@ -107,6 +107,7 @@ if not no_headers
 	install_headers(
 		'include/arpa/ftp.h',
 		'include/arpa/inet.h',
+		'include/arpa/telnet.h',
 		'include/arpa/tftp.h',
 		subdir: 'arpa'
 	)
