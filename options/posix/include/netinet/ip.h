@@ -67,6 +67,25 @@ struct iphdr {
 	uint32_t daddr;
 };
 
+#define IPOPT_EOL 0
+#define IPOPT_NOP 1
+
+#define IPOPT_RR 7
+#define IPOPT_TS 68
+#define IPOPT_SECURITY 130
+#define IPOPT_LSRR 131
+#define IPOPT_SATID 136
+#define IPOPT_SSRR 137
+
+#define IPOPT_OPTVAL 0
+#define IPOPT_OLEN 1
+#define IPOPT_OFFSET 2
+#define IPOPT_MINOFF 4
+
+#define IPOPT_TS_TSONLY 0
+#define IPOPT_TS_TSANDADDR 1
+#define IPOPT_TS_PRESPEC 3
+
 #ifdef __cplusplus
 }
 #endif
