@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <bits/ensure.h>
 #include <mlibc/elf/startup.h>
+#include <sys/auxv.h>
+
+size_t __hwcap;
 
 // defined by the POSIX library
 void __mlibc_initLocale();
@@ -29,6 +32,9 @@ LibraryGuard::LibraryGuard() {
 
 extern "C" void __mlibc_entry(uintptr_t *entry_stack, int (*main_fn)(int argc, char *argv[], char *env[])) {
 	__dlapi_enter(entry_stack);
+#if defined(__i386__)
+	__hwcap = getauxval(AT_HWCAP);
+#endif
 	auto result = main_fn(__mlibc_stack_data.argc, __mlibc_stack_data.argv, environ);
 	exit(result);
 }
