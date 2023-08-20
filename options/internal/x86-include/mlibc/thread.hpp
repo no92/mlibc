@@ -11,5 +11,11 @@ inline Tcb *get_current_tcb() {
 	return reinterpret_cast<Tcb *>(ptr);
 }
 
+inline uintptr_t get_sp() {
+	uintptr_t esp;
+	asm ("mov %%esp, %0" : "=r"(esp));
+	return esp;
+}
+
 } // namespace mlibc
 
