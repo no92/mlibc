@@ -1,7 +1,7 @@
 #ifndef MLIBC_FENV_H
 #define MLIBC_FENV_H
 
-#if defined(__x86_64__)
+#if defined(__x86_64__) || defined(__i386__)
 
 #define FE_DIVBYZERO 4
 #define FE_INEXACT 32
