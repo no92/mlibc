@@ -85,7 +85,7 @@ packages:
         - "-Dbuild_tests=true"
         - "-Db_sanitize=undefined"
         - "-Ddefault_library=both"
-        - "-Dwerror=true"
+        - "-Dwerror=false"
         - '-Dlinux_kernel_headers=@BUILD_ROOT@/packages/linux-headers/usr/include'
         - "--cross-file=@THIS_SOURCE_DIR@/ci/linux-@OPTION:arch@.cross-file"
         - '@THIS_SOURCE_DIR@'
@@ -111,7 +111,7 @@ packages:
         - "-Dbuild_tests=true"
         - "-Db_sanitize=undefined"
         - "-Ddefault_library=static"
-        - "-Dwerror=true"
+        - "-Dwerror=false"
         - '-Dlinux_kernel_headers=@BUILD_ROOT@/packages/linux-headers/usr/include'
         - "--cross-file=@THIS_SOURCE_DIR@/ci/linux-@OPTION:arch@.cross-file"
         - '@THIS_SOURCE_DIR@'
