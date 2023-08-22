@@ -94,8 +94,7 @@ typedef void (*__sighandler) (int);
 #define SEGV_MAPERR 1
 #define SEGV_ACCERR 2
 
-// TODO: replace this by uint64_t
-typedef long sigset_t;
+typedef uint64_t sigset_t;
 
 #define SIGUNUSED SIGSYS
 
