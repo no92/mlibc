@@ -18,7 +18,7 @@ __setjmp:
 	ret
 
   1:
-	jmp __sigsetjmp
+	jmp __sigsetjmp@PLT
 
 .global setjmp
 .type setjmp, "function"
@@ -43,8 +43,8 @@ longjmp:
 
 	mov 8(%esp), %eax
     test %eax, %eax
-    setz %al
-
+    jnz 1f
+1:
 	mov 0x10(%ecx), %esp
 	jmp *0x14(%ecx)
 
