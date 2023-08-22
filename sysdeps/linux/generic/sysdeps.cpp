@@ -619,6 +619,8 @@ extern "C" const char __mlibc_syscall_end[1];
 int sys_before_cancellable_syscall(ucontext_t *uct) {
 #if defined(__x86_64__)
 	auto pc = reinterpret_cast<void*>(uct->uc_mcontext.gregs[REG_RIP]);
+#elif defined(__i386__)
+	auto pc = reinterpret_cast<void*>(uct->uc_mcontext.gregs[REG_EIP]);
 #elif defined(__riscv)
 	auto pc = reinterpret_cast<void*>(uct->uc_mcontext.sc_regs.pc);
 #elif defined(__aarch64__)
