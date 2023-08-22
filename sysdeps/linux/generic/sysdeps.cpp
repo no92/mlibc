@@ -8,6 +8,7 @@
 #include <bits/ensure.h>
 #include <abi-bits/fcntl.h>
 #include <abi-bits/socklen_t.h>
+#include <mlibc/allocator.hpp>
 #include <mlibc/debug.hpp>
 #include <mlibc/all-sysdeps.hpp>
 #include <mlibc/thread-entry.hpp>
@@ -580,13 +581,31 @@ int sys_clone(void *tcb, pid_t *pid_out, void *stack) {
 	// TODO: We should change the sysdep so that we don't need to do this.
 	auto tp = reinterpret_cast<char *>(tcb) + sizeof(Tcb) - 0x10;
 	tcb = reinterpret_cast<void *>(tp);
+#elif defined(__i386__)
+	/* get the entry number, as we don't request a new one here */
+	uint32_t gs;
+    asm volatile("movw %%gs, %w0" : "=q"(gs));
+
+	auto user_desc = reinterpret_cast<struct user_desc *>(getAllocator().allocate(sizeof(struct user_desc)));
+
+	user_desc->entry_number = (gs & 0xffff) >> 3;
+	user_desc->base_addr = uintptr_t(tcb);
+	user_desc->limit = 0xfffff;
+	user_desc->seg_32bit = 1;
+	user_desc->contents = 0;
+	user_desc->read_exec_only = 0;
+	user_desc->limit_in_pages = 1;
+	user_desc->seg_not_present = 0;
+	user_desc->useable = 1;
+
+	tcb = reinterpret_cast<void *>(user_desc);
 #endif
 
 	auto ret = __mlibc_spawn_thread(flags, stack, pid_out, NULL, tcb);
 	if (ret < 0)
 		return ret;
 
-        return 0;
+	return 0;
 }
 
 extern "C" const char __mlibc_syscall_begin[1];
