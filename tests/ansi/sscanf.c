@@ -96,12 +96,14 @@ int main() {
 		assert(!strcmp(strparm, "0"));
 	}
 
+#if (__LONG_MAX__ == 0xFFFFFFFFFFFFFFFF)
 	{
 		char buf[] = "fffffffff100";
 		unsigned long y = 0;
 		sscanf(buf, "%lx", &y);
 		assert(y == 0xfffffffff100);
 	}
+#endif
 
 	{
 		char buf[] = "410dc000";
