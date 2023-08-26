@@ -20,6 +20,16 @@
 #include <dlfcn.h>
 #endif
 
+#if defined(__i386__)
+
+extern "C" [[noreturn]] void __stack_chk_fail(void);
+
+extern "C" [[noreturn, gnu::visibility("hidden"), gnu::weak]] void __stack_chk_fail_local() {
+	__stack_chk_fail();
+}
+
+#endif
+
 #define HIDDEN  __attribute__((__visibility__("hidden")))
 #define EXPORT  __attribute__((__visibility__("default")))
 

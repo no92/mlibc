@@ -1,4 +1,14 @@
 .section .text
+
+// extern "C" [[noreturn, gnu::visibility("hidden"), gnu::weak]] void __stack_chk_fail_local() {
+// 	__stack_chk_fail();
+// }
+
+.type __stack_chk_fail_local, %function
+.weak __stack_chk_fail_local
+__stack_chk_fail_local:
+	call __stack_chk_fail@plt
+
 .global _start
 
 .type _start, %function
