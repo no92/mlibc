@@ -848,8 +848,8 @@ void processCopyRelocations(SharedObject *object) {
 			auto reloc = (elf_rela *)(object->baseAddress + *rela_offset + offset);
 			processCopyRela(object, reloc);
 		}
-	} else if(rela_offset && rela_length) {
-		for(size_t offset = 0; offset < *rela_length; offset += sizeof(elf_rela)) {
+	} else if(rel_offset && rel_length) {
+		for(size_t offset = 0; offset < *rel_length; offset += sizeof(elf_rel)) {
 			auto reloc = (elf_rel *)(object->baseAddress + *rel_offset + offset);
 			processCopyRel(object, reloc);
 		}
