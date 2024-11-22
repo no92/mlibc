@@ -70,7 +70,7 @@ typedef off_t fpos_t;
 #define EOF (-1)
 
 #define FOPEN_MAX 1024
-#define FILENAME_MAX 256
+#define FILENAME_MAX 4096
 #define L_tmpnam 256
 
 #define TMP_MAX 1024
