@@ -20,7 +20,7 @@
 
 #endif /*_NET_IF_H */
 
-#if defined(_NETINET_IN_H)
+#if defined(_NETINET_IN_H) || defined(_ABIBITS_IN_H)
 
 #define __UAPI_DEF_IN_ADDR 0
 #define __UAPI_DEF_IN_CLASS 0
