@@ -6,8 +6,8 @@
 extern "C" {
 #endif
 
-#define GRND_RANDOM 1
-#define GRND_NONBLOCK 2
+#define GRND_NONBLOCK 1
+#define GRND_RANDOM 2
 
 #include <bits/ssize_t.h>
 #include <bits/size_t.h>
