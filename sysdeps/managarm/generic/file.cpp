@@ -2078,7 +2078,7 @@ int sys_stat(fsfd_target fsfdt, int fd, const char *path, int flags, struct stat
 		req.set_path(frg::string<MemoryAllocator>(getSysdepsAllocator(), path));
 	}
 
-	if (flags & ~(AT_SYMLINK_NOFOLLOW | AT_EMPTY_PATH)) {
+	if (flags & ~(AT_SYMLINK_NOFOLLOW | AT_EMPTY_PATH | AT_NO_AUTOMOUNT)) {
 		return EINVAL;
 	}
 
