@@ -190,6 +190,9 @@ packages:
             "riscv64")
               LINUX_ARCH="riscv"
               ;;
+            "loongarch64")
+              LINUX_ARCH="loongarch"
+              ;;
           esac
           make O=@THIS_COLLECT_DIR@ ARCH="$LINUX_ARCH" headers_install
 
